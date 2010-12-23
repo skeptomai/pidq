@@ -169,14 +169,13 @@ pidq_basics_test_() ->
       {"if a consumer crashes, pid is replaced",
        fun() ->
                Consumer = start_user(),
-               ?debugVal(Consumer),
-               Pids0 = [pidq:take_pid(), pidq:take_pid()],
-               Ids = [ get_tc_id(P) || P <- Pids0 ] ++ [user_id(Consumer)],
+               StartId = user_id(Consumer),
+               ?debugVal(pidq:pool_stats("p1")),
                user_crash(Consumer),
-               ?debugMsg("before get_n_pids"),
                NewPid = hd(get_n_pids(1, [])),
                NewId = get_tc_id(NewPid),
-               ?assertNot(lists:member(NewId, Ids))
+               ?debugVal(pidq:pool_stats("p1")),
+               ?assertNot(NewId == StartId)
        end
       }
      ]}.
